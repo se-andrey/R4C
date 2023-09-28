@@ -4,7 +4,6 @@ from django.dispatch import receiver
 from django.core.mail import send_mail
 from dotenv import load_dotenv
 
-from robots.models import Robot
 from orders.models import Order
 from orders.signals import robots_add_signal
 
@@ -17,11 +16,13 @@ FROM_EMAIL = os.getenv('FROM_EMAIL')
 def check_customer(sender, robot, **kwargs):
 
     matching_orders = Order.objects.filter(robot_serial=robot.serial)
-    print(2)
+
     for order in matching_orders:
 
         customer_email = order.customer.email
         subject = f'Робот доступен {robot.serial}'
-        message = f'Добрый день!\nНедавно вы интересовались нашим роботом модели {robot.model}, версии {robot.version}. Этот робот теперь в наличии. Если вам подходит этот вариант - пожалуйста, свяжитесь с нами.'
+        message = f'Добрый день!\nНедавно вы интересовались нашим роботом модели {robot.model}, ' \
+                  f'версии {robot.version}. Этот робот теперь в наличии.\n' \
+                  f'Если вам подходит этот вариант - пожалуйста, свяжитесь с нами.'
 
         send_mail(subject, message, FROM_EMAIL, [customer_email])
